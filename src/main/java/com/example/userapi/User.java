@@ -4,6 +4,7 @@ package com.example.userapi;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "user_carsil")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
