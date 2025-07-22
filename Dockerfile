@@ -1,5 +1,11 @@
+# Etapa 1: construir el JAR
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
+# Etapa 2: ejecutar el JAR
 FROM eclipse-temurin:17-jdk-alpine
-VOLUME /tmp
-COPY target/user-api-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
