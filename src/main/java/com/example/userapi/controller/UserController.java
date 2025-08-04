@@ -1,16 +1,13 @@
 
-package com.example.userapi;
+package com.example.userapi.controller;
 
+import com.example.userapi.service.UserService;
+import com.example.userapi.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {
-        "http://localhost:4200",
-        "https://user-app.onrender.com",
-        "*"
-})
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
