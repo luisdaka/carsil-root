@@ -4,8 +4,6 @@ package com.carsil.userapi.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "app_user")
 @Data // GETTER Y SETTER
