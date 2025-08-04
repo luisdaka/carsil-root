@@ -1,4 +1,4 @@
-package com.example.userapi.config;
+package com.carsil.userapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,8 +1,8 @@
 
-package com.example.userapi.controller;
+package com.carsil.userapi.controller;
 
-import com.example.userapi.service.UserService;
-import com.example.userapi.model.User;
+import com.carsil.userapi.service.UserService;
+import com.carsil.userapi.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

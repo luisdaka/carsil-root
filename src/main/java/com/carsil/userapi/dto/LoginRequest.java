@@ -1,4 +1,4 @@
-package com.example.userapi.dto;
+package com.carsil.userapi.dto;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.example.userapi;
+package com.carsil.userapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,7 +1,7 @@
-package com.example.userapi.service;
+package com.carsil.userapi.service;
 
-import com.example.userapi.model.User;
-import com.example.userapi.repository.UserRepository;
+import com.carsil.userapi.model.User;
+import com.carsil.userapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
-package com.example.userapi.controller;
+package com.carsil.userapi.controller;
 
-import com.example.userapi.dto.LoginRequest;
-import com.example.userapi.service.UserService;
+import com.carsil.userapi.dto.LoginRequest;
+import com.carsil.userapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

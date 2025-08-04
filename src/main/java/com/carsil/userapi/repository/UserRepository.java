@@ -1,7 +1,7 @@
 
-package com.example.userapi.repository;
+package com.carsil.userapi.repository;
 
-import com.example.userapi.model.User;
+import com.carsil.userapi.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

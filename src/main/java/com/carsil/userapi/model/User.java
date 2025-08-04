@@ -1,5 +1,5 @@
 
-package com.example.userapi.model;
+package com.carsil.userapi.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
