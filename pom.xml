@@ -18,7 +18,10 @@
 
     <properties>
         <java.version>17</java.version>
+<<<<<<< HEAD
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+=======
+>>>>>>> bdf657c (Agrego clase Product.java)
     </properties>
 
     <dependencies>
@@ -50,8 +53,30 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+<<<<<<< HEAD
     </dependencies>
 
+=======
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>user-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+
+    </dependencies>
+
+
+
+>>>>>>> bdf657c (Agrego clase Product.java)
     <build>
         <plugins>
             <plugin>
@@ -61,3 +86,7 @@
         </plugins>
     </build>
 </project>
+<<<<<<< HEAD
+=======
+
+>>>>>>> bdf657c (Agrego clase Product.java)
