@@ -19,9 +19,13 @@
     <properties>
         <java.version>17</java.version>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 =======
 >>>>>>> bdf657c (Agrego clase Product.java)
+=======
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+>>>>>>> 9b5b537 (Copiando cambios y agregando código fuente)
     </properties>
 
     <dependencies>
@@ -54,6 +58,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
     </dependencies>
 
 =======
@@ -77,6 +82,10 @@
 
 
 >>>>>>> bdf657c (Agrego clase Product.java)
+=======
+    </dependencies>
+
+>>>>>>> 9b5b537 (Copiando cambios y agregando código fuente)
     <build>
         <plugins>
             <plugin>
@@ -87,6 +96,9 @@
     </build>
 </project>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> bdf657c (Agrego clase Product.java)
+=======
+>>>>>>> 9b5b537 (Copiando cambios y agregando código fuente)
