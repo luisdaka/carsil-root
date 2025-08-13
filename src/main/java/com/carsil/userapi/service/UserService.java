@@ -35,6 +35,6 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
         return user.isPresent() &&
                 passwordEncoder.matches(rawPassword, user.get().getPassword());
-    } //esto no en producto.
+    }
 }
 
