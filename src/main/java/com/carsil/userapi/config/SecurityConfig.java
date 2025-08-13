@@ -26,10 +26,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users", "/api/auth/login", "/h2-console/**","*").permitAll()
+                        .requestMatchers("/api/users", "/api/auth/login", "/h2-console/**","/api/products").permitAll()
                         .anyRequest().authenticated()
                 )
-                .cors(Customizer.withDefaults()) // ✅ HABILITA CORS CORRECTAMENTE
+                .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
@@ -41,7 +41,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of("*")); // ✅ IMPORTANTE para que funcione con allowCredentials
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // ✅ Necesario si luego usas cookies, auth, etc.
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
