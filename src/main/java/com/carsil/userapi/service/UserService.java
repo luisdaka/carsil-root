@@ -31,8 +31,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public boolean validateLogin(String email, String rawPassword) {
-        Optional<User> user = userRepository.findByEmail(email);
+    public boolean validateLogin(String name, String rawPassword) {
+        Optional<User> user = userRepository.findByName(name);
         return user.isPresent() &&
                 passwordEncoder.matches(rawPassword, user.get().getPassword());
     }
