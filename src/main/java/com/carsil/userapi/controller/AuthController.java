@@ -19,7 +19,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
-        boolean authenticated = userService.validateLogin(loginRequest.getEmail(), loginRequest.getPassword());
+        boolean authenticated = userService.validateLogin(loginRequest.getUserName(), loginRequest.getPassword());
 
         Map<String, String> response = new HashMap<>();
         if (authenticated) {
