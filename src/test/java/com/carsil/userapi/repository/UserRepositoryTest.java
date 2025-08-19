@@ -21,11 +21,23 @@ class UserRepositoryTest {
         u.setName("luis");
         u.setEmail("l@test.com");
         u.setPassword("x");
-        userRepository.save(u); // JpaRepository.save(...):contentReference[oaicite:12]{index=12}
+        userRepository.save(u);
 
-        Optional<User> found = userRepository.findByName("luis"); // método declarado en tu repo:contentReference[oaicite:13]{index=13}
+        Optional<User> found = userRepository.findByName("luis");
         assertThat(found).isPresent();
         assertThat(found.get().getEmail()).isEqualTo("l@test.com");
+    }
+
+    @Test
+    void findByName_returnsUser_whenNoExists() {
+        User u = new User();
+        u.setName("Luis");
+        u.setEmail("l@test.com");
+        u.setPassword("x");
+        userRepository.save(u);
+
+        Optional<User> found = userRepository.findByName("luis");
+        assertThat(found).isEmpty();
     }
 
     @Test
