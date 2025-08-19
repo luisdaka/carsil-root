@@ -50,7 +50,7 @@ class UserControllerTest {
         Mockito.when(userService.create(any(User.class))).thenReturn(ret);
 
         mvc.perform(post("/api/users")
-                        .with(csrf())  // evita 403 por CSRF
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"luis\",\"email\":\"l@test.com\",\"password\":\"raw\"}"))
                 .andExpect(status().isOk())
@@ -65,7 +65,7 @@ class UserControllerTest {
         Mockito.when(userService.create(any(User.class))).thenReturn(ret);
 
         mvc.perform(put("/api/users/5")
-                        .with(csrf())  // evita 403 por CSRF
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"nuevo\",\"email\":\"n@test.com\",\"password\":\"raw\"}"))
                 .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class UserControllerTest {
     @Test
     void deleteUser_callsService() throws Exception {
         mvc.perform(delete("/api/users/9")
-                        .with(csrf()))  // evita 403 por CSRF
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         Mockito.verify(userService).delete(eq(9L));

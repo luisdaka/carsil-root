@@ -43,7 +43,7 @@ class AuthControllerTest {
         Mockito.when(userService.validateLogin("luis","bad")).thenReturn(false);
 
         mvc.perform(post("/api/auth/login")
-                        .with(csrf()) // evita 403 por CSRF
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"userName\":\"luis\",\"password\":\"bad\"}"))
                 .andExpect(status().isUnauthorized())
