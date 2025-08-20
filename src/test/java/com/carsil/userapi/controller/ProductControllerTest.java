@@ -43,6 +43,7 @@ class ProductControllerTest {
         objectMapper.findAndRegisterModules();
     }
 
+
     @Test
     void getProducts_returnsList_whenCalled() throws Exception {
         Product p1 = new Product();
