@@ -44,6 +44,7 @@ class ProductServiceTest {
         testProduct.setSize("SizeB");
     }
 
+
     @Test
     void getAll_returnsListOfProducts() {
 

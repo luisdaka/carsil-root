@@ -44,6 +44,7 @@ class ProductControllerTest {
     }
 
 
+
     @Test
     void getProducts_returnsList_whenCalled() throws Exception {
         Product p1 = new Product();
@@ -61,6 +62,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$[0].reference", is("REF10")))
                 .andExpect(jsonPath("$[1].reference", is("REF20")));
     }
+
+
 
     @Test
     void createProduct_callsService_andReturnsSaved() throws Exception {
