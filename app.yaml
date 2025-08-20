@@ -1,4 +1,4 @@
 
-runtime: java17
+runtime: java21
 instance_class: F1
 entrypoint: java -jar target/user-api-0.0.1-SNAPSHOT.jar
