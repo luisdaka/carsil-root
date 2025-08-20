@@ -49,11 +49,7 @@ class ProductServiceTest {
     void getAll_returnsListOfProducts() {
 
         when(productRepository.findAll()).thenReturn(Collections.singletonList(testProduct));
-
-
         List<Product> products = productService.getAll();
-
-
         assertNotNull(products);
         assertFalse(products.isEmpty());
         assertEquals(1, products.size());
@@ -66,23 +62,15 @@ class ProductServiceTest {
     void create_returnsSavedProduct() {
 
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
-
-
         Product createdProduct = productService.create(new Product());
-
-
         assertNotNull(createdProduct);
         assertEquals(testProduct.getReference(), createdProduct.getReference());
-
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
     @Test
     void delete_callsRepositoryDeleteById() {
-
         productService.delete(1L);
-
-
         verify(productRepository, times(1)).deleteById(1L);
     }
 
@@ -94,12 +82,9 @@ class ProductServiceTest {
 
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-
         when(productRepository.save(any(Product.class))).thenReturn(updatedData);
 
-
         Product result = productService.update(updatedData, 1L);
-
 
         assertNotNull(result);
         assertEquals(updatedData.getReference(), result.getReference());
@@ -114,11 +99,7 @@ class ProductServiceTest {
     void update_whenProductDoesNotExist_throwsException() {
 
         when(productRepository.findById(2L)).thenReturn(Optional.empty());
-
-
         assertThrows(RuntimeException.class, () -> productService.update(new Product(), 2L));
-
-
         verify(productRepository, never()).save(any(Product.class));
     }
 }
