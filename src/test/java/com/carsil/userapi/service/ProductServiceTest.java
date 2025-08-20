@@ -1,0 +1,105 @@
+package com.carsil.userapi.service;
+
+import com.carsil.userapi.model.Product;
+import com.carsil.userapi.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    private Product testProduct;
+
+    @BeforeEach
+    void setUp() {
+        testProduct = new Product();
+        testProduct.setId(1L);
+        testProduct.setPrice(150.0);
+        testProduct.setQuantity(10);
+        testProduct.setReference("REF123");
+        testProduct.setBrand("BrandX");
+        testProduct.setAssignedDate(LocalDate.now());
+        testProduct.setPlantEntryDate(LocalDate.now());
+        testProduct.setOp("OP456");
+        testProduct.setCampaign("C789");
+        testProduct.setType("TypeA");
+        testProduct.setSize("SizeB");
+    }
+
+
+    @Test
+    void getAll_returnsListOfProducts() {
+
+        when(productRepository.findAll()).thenReturn(Collections.singletonList(testProduct));
+        List<Product> products = productService.getAll();
+        assertNotNull(products);
+        assertFalse(products.isEmpty());
+        assertEquals(1, products.size());
+        assertEquals(testProduct.getReference(), products.get(0).getReference());
+
+        verify(productRepository, times(1)).findAll();
+    }
+
+    @Test
+    void create_returnsSavedProduct() {
+
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+        Product createdProduct = productService.create(new Product());
+        assertNotNull(createdProduct);
+        assertEquals(testProduct.getReference(), createdProduct.getReference());
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void delete_callsRepositoryDeleteById() {
+        productService.delete(1L);
+        verify(productRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void update_whenProductExists_returnsUpdatedProduct() {
+        Product updatedData = new Product();
+        updatedData.setReference("UPDATED_REF");
+        updatedData.setPrice(99.99);
+
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.save(any(Product.class))).thenReturn(updatedData);
+
+        Product result = productService.update(updatedData, 1L);
+
+        assertNotNull(result);
+        assertEquals(updatedData.getReference(), result.getReference());
+        assertEquals(updatedData.getPrice(), result.getPrice());
+
+
+        verify(productRepository, times(1)).findById(1L);
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void update_whenProductDoesNotExist_throwsException() {
+
+        when(productRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> productService.update(new Product(), 2L));
+        verify(productRepository, never()).save(any(Product.class));
+    }
+}
