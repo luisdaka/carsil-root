@@ -1,6 +1,7 @@
 package com.carsil.userapi.service;
 
 import com.carsil.userapi.model.Product;
+import com.carsil.userapi.model.User;
 import com.carsil.userapi.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -55,5 +56,9 @@ public class ProductService {
 
     public List<Product> search(String q) {
         return productRepository.search(Optional.ofNullable(q).orElse("").trim());
+    }
+
+    public Optional<Product> getById(Long id) {
+        return productRepository.findById(id);
     }
 }

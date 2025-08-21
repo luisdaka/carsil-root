@@ -3,6 +3,7 @@ package com.carsil.userapi.controller;
 import com.carsil.userapi.model.Product;
 import com.carsil.userapi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +38,12 @@ public class ProductController {
     @GetMapping("/search")
     public List<Product> searchProducts(@RequestParam("q") String q) {
         return productService.search(q);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
