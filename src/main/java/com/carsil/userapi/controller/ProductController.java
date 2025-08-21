@@ -34,4 +34,8 @@ public class ProductController {
         return productService.update(product, id);
     }
 
+    @GetMapping("/search")
+    public List<Product> searchProducts(@RequestParam("q") String q) {
+        return productService.search(q);
+    }
 }

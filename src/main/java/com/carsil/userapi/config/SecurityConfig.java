@@ -31,7 +31,7 @@ public class SecurityConfig {
                                 "/api/users/**",
                                 "/api/auth/login",
                                 "/h2-console/**",
-                                "/api/products","*").permitAll()
+                                "/api/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())

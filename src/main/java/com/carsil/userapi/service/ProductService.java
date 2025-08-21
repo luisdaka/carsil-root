@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -43,4 +44,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + product.getId()));
     }
 
+    public List<Product> search(String q) {
+        return productRepository.search(Optional.ofNullable(q).orElse("").trim());
+    }
 }

@@ -131,4 +131,54 @@ class ProductControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void searchProducts_returnsMultipleMatches_whenQueryAppearsInDifferentFields() throws Exception {
+        Product p1 = new Product();
+        p1.setId(301L);
+        p1.setReference("NIKE-REF");
+        p1.setBrand("BrandX");
+        p1.setOp("OP123");
+        p1.setCampaign("CAMP1");
+        p1.setAssignedDate(LocalDate.now());
+        p1.setPlantEntryDate(LocalDate.now());
+        p1.setPrice(100.0);
+        p1.setQuantity(5);
+        p1.setType("TypeA");
+        p1.setSize("SizeM");
+
+        Product p2 = new Product();
+        p2.setId(302L);
+        p2.setReference("REF999");
+        p2.setBrand("Nike");
+        p2.setOp("OP999");
+        p2.setCampaign("CAMP2");
+        p2.setAssignedDate(LocalDate.now());
+        p2.setPlantEntryDate(LocalDate.now());
+        p2.setPrice(200.0);
+        p2.setQuantity(10);
+        p2.setType("TypeB");
+        p2.setSize("SizeL");
+
+        Mockito.when(productService.search("nike")).thenReturn(List.of(p1, p2));
+
+        mvc.perform(get("/api/products/search")
+                        .param("q", "nike"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(301)))
+                .andExpect(jsonPath("$[0].reference", is("NIKE-REF")))
+                .andExpect(jsonPath("$[1].id", is(302)))
+                .andExpect(jsonPath("$[1].brand", is("Nike")));
+    }
+
+    @Test
+    void searchProducts_returnsEmptyList_whenNoMatchesFound() throws Exception {
+        Mockito.when(productService.search("ghost")).thenReturn(List.of());
+
+        mvc.perform(get("/api/products/search")
+                        .param("q", "ghost"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
 }

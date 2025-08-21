@@ -102,4 +102,42 @@ class ProductServiceTest {
         assertThrows(RuntimeException.class, () -> productService.update(new Product(), 2L));
         verify(productRepository, never()).save(any(Product.class));
     }
+
+    @Test
+    void search_returnsMultipleProducts_whenQueryMatchesDifferentFields() {
+        Product p1 = new Product();
+        p1.setId(401L);
+        p1.setReference("NIKE-REF");
+        p1.setBrand("BrandZ");
+        p1.setOp("OP-NIKE");
+        p1.setCampaign("CAMPZ");
+        p1.setAssignedDate(LocalDate.now());
+        p1.setPlantEntryDate(LocalDate.now());
+        p1.setPrice(150.0);
+        p1.setQuantity(3);
+        p1.setType("TypeX");
+        p1.setSize("SizeS");
+
+        Product p2 = new Product();
+        p2.setId(402L);
+        p2.setReference("REF123");
+        p2.setBrand("Nike");
+        p2.setOp("OP123");
+        p2.setCampaign("CAMPY");
+        p2.setAssignedDate(LocalDate.now());
+        p2.setPlantEntryDate(LocalDate.now());
+        p2.setPrice(250.0);
+        p2.setQuantity(7);
+        p2.setType("TypeY");
+        p2.setSize("SizeM");
+
+        when(productRepository.search("nike")).thenReturn(List.of(p1, p2));
+
+        List<Product> results = productService.search("nike");
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(p -> "Nike".equals(p.getBrand())));
+        assertTrue(results.stream().anyMatch(p -> p.getReference().contains("NIKE")));
+    }
 }
