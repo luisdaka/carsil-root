@@ -19,4 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            OR LOWER(p.brand)     LIKE LOWER(CONCAT('%', :q, '%'))
     """)
     List<Product> search(@Param("q") String q);
+    boolean existsByOp(String op);
+    boolean existsByOpAndIdNot(String op, Long id);
 }

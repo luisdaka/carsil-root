@@ -36,5 +36,14 @@ public class UserService {
         return user.isPresent() &&
                 passwordEncoder.matches(rawPassword, user.get().getPassword());
     }
+
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> getByName(String name) {
+        return userRepository.findByName(name);
+    }
+
 }
 
