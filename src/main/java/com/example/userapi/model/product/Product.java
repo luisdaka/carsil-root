@@ -1,13 +1,16 @@
 package com.example.userapi.model.product;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
 import lombok.Data;
 
 import java.time.LocalDate;
-
 @Entity
-@Data
 @Table(name = "app_product")
+@Data
 public class Product {
 
     @Id
