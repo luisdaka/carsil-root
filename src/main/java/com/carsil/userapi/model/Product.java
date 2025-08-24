@@ -57,5 +57,8 @@ public class Product {
     @NotNull
     @Column(nullable = false)
     private String size;
+
+    @Column(nullable = true)
+    private String description ;
 }
 
