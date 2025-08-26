@@ -1,10 +1,8 @@
 package com.carsil.userapi.service;
 
 import com.carsil.userapi.model.Module;
-import com.carsil.userapi.model.Product;
 import com.carsil.userapi.repository.ModuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +26,8 @@ public class ModuleService {
         return moduleRepository.findByNameContainingIgnoreCase(name);
     }
 
-    public Module create(Module product) {
-        return moduleRepository.save(product);
+    public Module create(Module module) {
+        return moduleRepository.save(module);
     }
+
 }

@@ -1,7 +1,6 @@
 package com.carsil.userapi.service;
 
 import com.carsil.userapi.model.Product;
-import com.carsil.userapi.model.User;
 import com.carsil.userapi.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
