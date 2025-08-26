@@ -1,8 +1,10 @@
 package com.carsil.userapi.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "app_modules")
 public class Module {
 
@@ -18,27 +20,4 @@ public class Module {
     @Column(nullable = false)
     private float remainingTime = 0f;
 
-    public Module() {}
-
-    public Module(String name) {
-        this.name = name;
-    }
-
-    public Module(String description, String name, float remainingTime) {
-        this.description = description;
-        this.name = name;
-        this.remainingTime = remainingTime;
-    }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public float getRemainingTime() { return remainingTime; }
-    public void setRemainingTime(float remainingTime) { this.remainingTime = remainingTime; }
 }

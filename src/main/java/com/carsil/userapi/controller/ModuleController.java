@@ -33,4 +33,9 @@ public class ModuleController {
     public List<Module> findByName(@RequestParam String name) {
         return moduleService.findByName(name);
     }
+
+    @PostMapping
+    public Module create(@RequestBody Module module) {
+        return moduleService.create(module);
+    }
 }
