@@ -30,4 +30,12 @@ public class ModuleService {
         return moduleRepository.save(module);
     }
 
+    public Optional<Module> update(Long id, Module input) {
+        return moduleRepository.findById(id).map(existing -> {
+            existing.setDescription(input.getDescription());
+            existing.setName(input.getName());
+            existing.setRemainingTime(input.getRemainingTime());
+            return moduleRepository.save(existing);
+        });
+    }
 }

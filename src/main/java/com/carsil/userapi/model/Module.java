@@ -1,15 +1,21 @@
 package com.carsil.userapi.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
-@Table(name = "app_modules")
+@Table(name = "carsil_modules")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Module {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String description;
@@ -19,5 +25,4 @@ public class Module {
 
     @Column(nullable = false)
     private float remainingTime = 0f;
-
 }

@@ -2,20 +2,26 @@ package com.carsil.userapi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
 @Table(
-        name = "app_product",
-        uniqueConstraints = @UniqueConstraint(name = "uk_app_product_op", columnNames = "op")
+        name = "carsil_product",
+        uniqueConstraints = @UniqueConstraint(name = "uk_carsil_product_op", columnNames = "op")
 )
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @NotNull
@@ -58,7 +64,6 @@ public class Product {
     @Column(nullable = false)
     private String size;
 
-    @Column(nullable = true)
-    private String description ;
+    @Column
+    private String description;
 }
-

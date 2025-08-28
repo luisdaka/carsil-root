@@ -29,7 +29,7 @@ public class ModuleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/search")
+    @GetMapping("/by-name")
     public List<Module> findByName(@RequestParam String name) {
         return moduleService.findByName(name);
     }
@@ -37,5 +37,12 @@ public class ModuleController {
     @PostMapping
     public Module create(@RequestBody Module module) {
         return moduleService.create(module);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Module> update(@PathVariable Long id, @RequestBody Module input) {
+        return moduleService.update(id, input)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
