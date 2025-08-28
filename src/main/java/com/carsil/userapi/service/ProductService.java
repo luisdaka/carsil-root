@@ -47,6 +47,7 @@ public class ProductService {
                     existing.setCampaign(product.getCampaign());
                     existing.setType(product.getType());
                     existing.setSize(product.getSize());
+                    existing.setDescription(product.getDescription());
                     return productRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
