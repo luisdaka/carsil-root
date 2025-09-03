@@ -1,7 +1,9 @@
 package com.carsil.userapi.service;
 
 import com.carsil.userapi.model.Product;
+import com.carsil.userapi.model.User;
 import com.carsil.userapi.repository.ProductRepository;
+import com.carsil.userapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository; // injects the user repository
 
     public List<Product> getAll() {
         return productRepository.findAll();
@@ -28,6 +33,15 @@ public class ProductService {
             throw new DuplicateKeyException("op already exists: " + product.getOp());
         }
         return productRepository.save(product);
+    }
+
+
+    public Product create(Product product, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+
+        product.setUser(user);
+        return create(product);
     }
 
     public Product update(Product product, Long id) {
@@ -53,6 +67,13 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
     }
 
+    public Product update(Product product, Long id, Long userId) {
+        Product updated = update(product, id);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+        updated.setUser(user);
+        return updated;
+    }
 
     public List<Product> search(String q) {
         return productRepository.search(Optional.ofNullable(q).orElse("").trim());

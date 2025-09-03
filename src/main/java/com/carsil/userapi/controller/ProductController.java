@@ -20,9 +20,10 @@ public class ProductController {
         return productService.getAll();
     }
 
+    // Crear producto asignando usuario
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.create(product);
+    public Product createProduct(@RequestBody Product product, @RequestParam Long userId) {
+        return productService.create(product, userId);
     }
 
     @DeleteMapping("/{id}")
@@ -30,9 +31,10 @@ public class ProductController {
         productService.delete(id);
     }
 
+    // Actualizar producto asignando usuario
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.update(product, id);
+    public Product updateProduct(@PathVariable Long id, @RequestBody Product product, @RequestParam Long userId) {
+        return productService.update(product, id, userId);
     }
 
     @GetMapping("/search")
