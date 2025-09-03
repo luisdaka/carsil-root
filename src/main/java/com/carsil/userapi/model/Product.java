@@ -3,6 +3,9 @@ package com.carsil.userapi.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
@@ -11,6 +14,7 @@ import java.time.LocalDate;
         name = "carsil_product",
         uniqueConstraints = @UniqueConstraint(name = "uk_carsil_product_op", columnNames = "op")
 )
+@EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,4 +70,17 @@ public class Product {
 
     @Column
     private String description;
+
+    @CreatedBy
+    @ManyToOne
+    @JoinColumn(name = "created_by_user_id")
+    private User createdBy;
+
+    @LastModifiedBy
+    @ManyToOne
+    @JoinColumn(name = "modified_by_user_id")
+    private User modifiedBy;
+
+    public void setUser(User user) {
+    }
 }
