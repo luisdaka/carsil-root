@@ -58,7 +58,6 @@ public class ProductService {
         p.setOp(incoming.getOp());
         p.setCampaign(incoming.getCampaign());
         p.setType(incoming.getType());
-        p.setSize(incoming.getSize());
         p.setDescription(incoming.getDescription());
         p.setSizeQuantities(incoming.getSizeQuantities());
 
@@ -93,7 +92,6 @@ public class ProductService {
                     existing.setOp(product.getOp());
                     existing.setCampaign(product.getCampaign());
                     existing.setType(product.getType());
-                    existing.setSize(product.getSize());
                     existing.setDescription(product.getDescription());
                     existing.setSizeQuantities(product.getSizeQuantities());
 

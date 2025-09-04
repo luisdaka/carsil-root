@@ -62,10 +62,6 @@ public class Product {
     @Column(nullable = false)
     private String type;
 
-    @NotNull
-    @Column(nullable = false)
-    private String size;
-
     @Column
     private String description;
 
