@@ -21,10 +21,8 @@ public class Module {
     @EqualsAndHashCode.Include
     private Long id;
 
-
     @Size(max = 255, message = "La descripción no puede exceder los 255 caracteres.")
     private String description;
-
 
     @NotNull(message = "El nombre del módulo no puede ser nulo.")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres.")

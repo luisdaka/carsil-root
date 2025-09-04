@@ -42,12 +42,10 @@ public class Product {
     @Column(nullable = false)
     private LocalDate plantEntryDate;
 
-
     @NotNull
     @Pattern(regexp = "^[0-9]*$", message = "La referencia debe contener solo números.")
     @Column(nullable = false)
     private String reference;
-
 
     @NotNull
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*$", message = "La marca debe contener solo letras.")
