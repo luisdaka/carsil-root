@@ -77,7 +77,6 @@ class ProductControllerTest {
         productToSave.setOp("OP123");
         productToSave.setCampaign("CAMP1");
         productToSave.setType("TypeA");
-        productToSave.setSize("SizeB");
 
         Product savedProduct = new Product();
         savedProduct.setId(15L);
@@ -106,7 +105,6 @@ class ProductControllerTest {
         productToUpdate.setOp("OP456");
         productToUpdate.setCampaign("CAMP2");
         productToUpdate.setType("TypeB");
-        productToUpdate.setSize("SizeC");
 
         Product updatedProduct = new Product();
         updatedProduct.setId(12L);
@@ -145,7 +143,6 @@ class ProductControllerTest {
         p1.setPrice(100.0);
         p1.setQuantity(5);
         p1.setType("TypeA");
-        p1.setSize("SizeM");
 
         Product p2 = new Product();
         p2.setId(302L);
@@ -158,7 +155,6 @@ class ProductControllerTest {
         p2.setPrice(200.0);
         p2.setQuantity(10);
         p2.setType("TypeB");
-        p2.setSize("SizeL");
 
         Mockito.when(productService.search("nike")).thenReturn(List.of(p1, p2));
 
