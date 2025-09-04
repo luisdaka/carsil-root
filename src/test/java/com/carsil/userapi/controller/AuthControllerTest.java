@@ -26,6 +26,7 @@ class AuthControllerTest {
     @MockBean
     private UserService userService;
 
+
     @Test
     void login_returns200_whenValid() throws Exception {
         Mockito.when(userService.validateLogin("luis","secret")).thenReturn(true);
