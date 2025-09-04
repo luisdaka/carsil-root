@@ -41,7 +41,6 @@ class ProductServiceTest {
         testProduct.setOp("OP456");
         testProduct.setCampaign("C789");
         testProduct.setType("TypeA");
-        testProduct.setSize("SizeB");
     }
 
 
@@ -116,7 +115,6 @@ class ProductServiceTest {
         p1.setPrice(150.0);
         p1.setQuantity(3);
         p1.setType("TypeX");
-        p1.setSize("SizeS");
 
         Product p2 = new Product();
         p2.setId(402L);
@@ -129,7 +127,6 @@ class ProductServiceTest {
         p2.setPrice(250.0);
         p2.setQuantity(7);
         p2.setType("TypeY");
-        p2.setSize("SizeM");
 
         when(productRepository.search("nike")).thenReturn(List.of(p1, p2));
 

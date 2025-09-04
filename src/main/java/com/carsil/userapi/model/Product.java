@@ -2,11 +2,11 @@ package com.carsil.userapi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(
@@ -28,11 +28,11 @@ public class Product {
 
     @NotNull
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
     @NotNull
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity = 0;
 
     @NotNull
     @Column(nullable = false)
@@ -43,35 +43,50 @@ public class Product {
     private LocalDate plantEntryDate;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "La referencia debe contener solo números.")
     @Column(nullable = false)
     private String reference;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*$", message = "La marca debe contener solo letras.")
     @Column(nullable = false)
     private String brand;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "El campo OP debe contener solo números.")
     @Column(nullable = false)
     private String op;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "La campaña debe contener solo números.")
     @Column(nullable = false)
     private String campaign;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "El tipo debe contener letras y números.")
     @Column(nullable = false)
     private String type;
 
-    @NotNull
-    @Size(min = 1, max = 4, message = "La talla debe tener entre 1 y 4 caracteres.")
-    @Column(nullable = false)
-    private String size;
-
     @Column
     private String description;
+
+    @ElementCollection
+    @CollectionTable(name = "product_size_quantities", joinColumns = @JoinColumn(name = "product_id"))
+    @MapKeyColumn(name = "size")
+    @Column(name = "units")
+    private Map<String, Integer> sizeQuantities = new HashMap<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "module_id", nullable = true)
+    private Module module;
+    @PrePersist @PreUpdate
+    private void validateAndSyncQuantity() {
+        if (sizeQuantities == null) sizeQuantities = new HashMap<>();
+        sizeQuantities.replaceAll((k, v) -> v == null ? 0 : Math.max(0, v));
+
+        int sum = sizeQuantities.values().stream().mapToInt(Integer::intValue).sum();
+
+        if (quantity == null || quantity == 0) {
+            quantity = sum;
+        } else if (!quantity.equals(sum)) {
+            throw new IllegalArgumentException(
+                    "La suma por tallas (" + sum + ") no coincide con el total (quantity=" + quantity + ")"
+            );
+        }
+    }
 }
