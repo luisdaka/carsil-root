@@ -3,7 +3,6 @@ package com.carsil.userapi.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -45,27 +44,27 @@ public class Product {
     private LocalDate plantEntryDate;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "La referencia debe contener solo números.")
+    @Pattern(regexp = "^[0-9]*$", message = "The reference must contain only numbers.")
     @Column(nullable = false)
     private String reference;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*$", message = "La marca debe contener solo letras.")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*$", message = "The brand must contain only letters.")
     @Column(nullable = false)
     private String brand;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "El campo OP debe contener solo números.")
+    @Pattern(regexp = "^[0-9]*$", message = "The OP field must contain only numbers.")
     @Column(nullable = false)
     private String op;
 
     @NotNull
-    @Pattern(regexp = "^[0-9]*$", message = "La campaña debe contener solo números.")
+    @Pattern(regexp = "^[0-9]*$", message = "The campaign must contain only numbers.")
     @Column(nullable = false)
     private String campaign;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "El tipo debe contener letras y números.")
+    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "The type must contain letters and numbers.")
     @Column(nullable = false)
     private String type;
 
@@ -81,7 +80,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "module_id", nullable = true)
     private Module module;
-    @PrePersist @PreUpdate
+
+    @PrePersist
+    @PreUpdate
     private void validateAndSyncQuantity() {
         if (sizeQuantities == null) sizeQuantities = new HashMap<>();
         sizeQuantities.replaceAll((k, v) -> v == null ? 0 : Math.max(0, v));
@@ -92,9 +93,8 @@ public class Product {
             quantity = sum;
         } else if (!quantity.equals(sum)) {
             throw new IllegalArgumentException(
-                    "La suma por tallas (" + sum + ") no coincide con el total (quantity=" + quantity + ")"
+                    "The sum of sizes (" + sum + ") does not match the total (quantity=" + quantity + ")"
             );
         }
     }
 }
-
