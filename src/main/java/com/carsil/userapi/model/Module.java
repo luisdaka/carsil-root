@@ -1,5 +1,6 @@
 package com.carsil.userapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Module {
 
     @Id

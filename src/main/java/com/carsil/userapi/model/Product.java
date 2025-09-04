@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(
@@ -26,11 +28,11 @@ public class Product {
 
     @NotNull
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
     @NotNull
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity = 0;
 
     @NotNull
     @Column(nullable = false)
@@ -66,4 +68,29 @@ public class Product {
 
     @Column
     private String description;
+
+    @ElementCollection
+    @CollectionTable(name = "product_size_quantities", joinColumns = @JoinColumn(name = "product_id"))
+    @MapKeyColumn(name = "size")
+    @Column(name = "units")
+    private Map<String, Integer> sizeQuantities = new HashMap<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "module_id", nullable = true)
+    private Module module;
+    @PrePersist @PreUpdate
+    private void validateAndSyncQuantity() {
+        if (sizeQuantities == null) sizeQuantities = new HashMap<>();
+        sizeQuantities.replaceAll((k, v) -> v == null ? 0 : Math.max(0, v));
+
+        int sum = sizeQuantities.values().stream().mapToInt(Integer::intValue).sum();
+
+        if (quantity == null || quantity == 0) {
+            quantity = sum;
+        } else if (!quantity.equals(sum)) {
+            throw new IllegalArgumentException(
+                    "La suma por tallas (" + sum + ") no coincide con el total (quantity=" + quantity + ")"
+            );
+        }
+    }
 }
