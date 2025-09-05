@@ -23,17 +23,17 @@ public class Module {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Size(max = 255, message = "La descripción no puede exceder los 255 caracteres.")
+    @Size(max = 255, message = "The description cannot exceed 255 characters.")
     private String description;
 
-    @NotNull(message = "El nombre del módulo no puede ser nulo.")
-    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres.")
+    @NotNull(message = "Module name cannot be null.")
+    @Size(min = 2, max = 100, message = "The name must have between 2 and 100 characters.")
     @Column(nullable = false)
     private String name;
 
 
-    @NotNull(message = "El tiempo restante no puede ser nulo.")
-    @Min(value = 0, message = "El tiempo restante no puede ser un valor negativo.")
+    @NotNull(message = "Remaining time cannot be null.")
+    @Min(value = 0, message = "Remaining time cannot be a negative value.")
     @Column(nullable = false)
     private float remainingTime = 0f;
 }

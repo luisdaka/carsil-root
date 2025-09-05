@@ -21,19 +21,19 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NotNull(message = "El nombre no puede ser nulo.")
-    @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres.")
+    @NotNull(message = "Name cannot be null.")
+    @Size(min = 2, max = 50, message = "The name must have between 2 and 50 characters.")
     @Column(nullable = false)
     private String name;
 
 
-    @NotNull(message = "El email no puede ser nulo.")
-    @Email(message = "El email debe tener un formato válido.")
+    @NotNull(message = "Email cannot be null.")
+    @Email(message = "Email must be in a valid format.")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotNull(message = "La contraseña no puede ser nula.")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres.")
+    @NotNull(message = "Password cannot be null.")
+    @Size(min = 6, message = "The password must have at least 6 characters.")
     @Column(nullable = false)
     private String password;
 }
