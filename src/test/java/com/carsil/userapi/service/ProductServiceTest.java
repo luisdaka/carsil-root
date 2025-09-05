@@ -174,7 +174,7 @@ class ProductServiceTest {
 
     @Test
     void getById_whenProductExists_returnsProduct() {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+         when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
 
         Optional<Product> result = productService.getById(1L);
 
