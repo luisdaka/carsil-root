@@ -179,11 +179,12 @@ class ProductServiceTest {
         Optional<Product> result = productService.getById(1L);
 
         assertTrue(result.isPresent());
-         assertEquals(testProduct.getReference(), result.get().getReference());
+        assertEquals(testProduct.getReference(), result.get().getReference());
         verify(productRepository, times(1)).findById(1L);
     }
 
     @Test
+
     void getById_whenProductDoesNotExist_returnsEmptyOptional() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
