@@ -2,6 +2,9 @@ package com.carsil.userapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -20,11 +23,17 @@ public class Module {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Size(max = 255, message = "The description cannot exceed 255 characters.")
     private String description;
 
+    @NotNull(message = "Module name cannot be null.")
+    @Size(min = 2, max = 100, message = "The name must have between 2 and 100 characters.")
     @Column(nullable = false)
     private String name;
 
+
+    @NotNull(message = "Remaining time cannot be null.")
+    @Min(value = 0, message = "Remaining time cannot be a negative value.")
     @Column(nullable = false)
     private float remainingTime = 0f;
 }
