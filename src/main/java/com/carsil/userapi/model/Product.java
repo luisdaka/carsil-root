@@ -14,7 +14,8 @@ import java.util.Map;
         name = "carsil_product",
         uniqueConstraints = @UniqueConstraint(name = "uk_carsil_product_op", columnNames = "op")
 )
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,6 +27,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    private String name;
 
     @NotNull
     @Column(nullable = false)
@@ -41,7 +44,7 @@ public class Product {
 
     @NotNull
     @Column(nullable = false)
-    private LocalDate plantEntryDate;
+    private LocalDate plantEntryDate; // usado en el filtro de fechas
 
     @NotNull
     @Pattern(regexp = "^[0-9]*$", message = "The reference must contain only numbers.")
@@ -68,17 +71,18 @@ public class Product {
     @Column(nullable = false)
     private String type;
 
-    @Column
     private String description;
 
+    // Mapa de tallas y unidades
     @ElementCollection
     @CollectionTable(name = "product_size_quantities", joinColumns = @JoinColumn(name = "product_id"))
     @MapKeyColumn(name = "size")
     @Column(name = "units")
     private Map<String, Integer> sizeQuantities = new HashMap<>();
 
+    // Relación con módulo
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "module_id", nullable = true)
+    @JoinColumn(name = "module_id")
     private Module module;
 
     @PrePersist

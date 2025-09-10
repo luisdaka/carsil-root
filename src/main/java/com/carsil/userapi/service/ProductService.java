@@ -1,25 +1,41 @@
 package com.carsil.userapi.service;
 
+import com.carsil.userapi.model.Module;
 import com.carsil.userapi.model.Product;
 import com.carsil.userapi.repository.ModuleRepository;
 import com.carsil.userapi.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.carsil.userapi.model.Module;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class   ProductService {
+public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    private final ModuleRepository moduleRepo;
 
-    @Autowired
-    private ModuleRepository moduleRepo;
+    // Inyección por constructor
+    public ProductService(ProductRepository productRepository, ModuleRepository moduleRepo) {
+        this.productRepository = productRepository;
+        this.moduleRepo = moduleRepo;
+    }
+
+    // Obtener productos por módulo
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByModule(Long moduleId) {
+        return productRepository.findByModuleId(moduleId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> getProductsByDateRange(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return productRepository.findByPlantEntryDateBetween(startDate, endDate, pageable);
+    }
 
     @Transactional(readOnly = true)
     public List<Product> getAll() {
@@ -36,10 +52,11 @@ public class   ProductService {
     @Transactional
     public Product create(Product incoming) {
         if (incoming.getOp() != null && productRepository.existsByOp(incoming.getOp())) {
-            throw new IllegalArgumentException("this OP already exists: " + incoming.getOp());
+            throw new IllegalArgumentException("This OP already exists: " + incoming.getOp());
         }
 
         Product p = new Product();
+
         if (incoming.getModule() != null && incoming.getModule().getId() != null) {
             Long moduleId = incoming.getModule().getId();
             Module module = moduleRepo.findById(moduleId)
@@ -49,6 +66,7 @@ public class   ProductService {
             p.setModule(null);
         }
 
+        // Copiar campos
         p.setPrice(incoming.getPrice());
         p.setQuantity(incoming.getQuantity());
         p.setAssignedDate(incoming.getAssignedDate());
@@ -71,7 +89,7 @@ public class   ProductService {
                     // Validación: OP única si cambió
                     if (!existing.getOp().equals(product.getOp())
                             && productRepository.existsByOpAndIdNot(product.getOp(), id)) {
-                        throw new DuplicateKeyException("op already exists: " + product.getOp());
+                        throw new DuplicateKeyException("OP already exists: " + product.getOp());
                     }
 
                     Module newModule = null;
@@ -82,7 +100,7 @@ public class   ProductService {
                     }
                     existing.setModule(newModule);
 
-                    // Copiar campos (los de TU entidad)
+                    // Copiar campos
                     existing.setPrice(product.getPrice());
                     existing.setQuantity(product.getQuantity());
                     existing.setAssignedDate(product.getAssignedDate());
@@ -99,7 +117,6 @@ public class   ProductService {
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
     }
-
 
     @Transactional(readOnly = true)
     public List<Product> search(String q) {
