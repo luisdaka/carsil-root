@@ -9,13 +9,14 @@ import lombok.*;
 
 @Entity
 @Table(name = "carsil_modules")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Module {
 
     @Id
@@ -33,7 +34,10 @@ public class Module {
 
 
     @NotNull(message = "Remaining time cannot be null.")
-    @Min(value = 0, message = "Remaining time cannot be a negative value.")
+    @Min(value = 0, message = "loadDays cannot be a negative value.")
     @Column(nullable = false)
-    private float remainingTime = 0f;
+    private float loadDays = 0f;
+
+    @Column
+    private Integer numPersons;
 }

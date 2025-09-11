@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.carsil.userapi.model.Module;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class   ProductService {
+public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
@@ -109,5 +110,15 @@ public class   ProductService {
     @Transactional(readOnly = true)
     public Optional<Product> getById(Long id) {
         return productRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByModule(Long moduleId) {
+        return productRepository.findByModuleId(moduleId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByDateRange(LocalDate startDate, LocalDate endDate) {
+        return productRepository.findByPlantEntryDateBetween(startDate, endDate);
     }
 }

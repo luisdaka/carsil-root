@@ -34,7 +34,7 @@ public class ModuleService {
         return moduleRepository.findById(id).map(existing -> {
             existing.setDescription(input.getDescription());
             existing.setName(input.getName());
-            existing.setRemainingTime(input.getRemainingTime());
+            existing.setLoadDays(input.getLoadDays());
             return moduleRepository.save(existing);
         });
     }

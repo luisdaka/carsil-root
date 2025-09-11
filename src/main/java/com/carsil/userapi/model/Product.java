@@ -14,7 +14,8 @@ import java.util.Map;
         name = "carsil_product",
         uniqueConstraints = @UniqueConstraint(name = "uk_carsil_product_op", columnNames = "op")
 )
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -77,8 +78,8 @@ public class Product {
     @Column(name = "units")
     private Map<String, Integer> sizeQuantities = new HashMap<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "module_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "module_id")
     private Module module;
 
     @PrePersist
@@ -97,4 +98,41 @@ public class Product {
             );
         }
     }
+
+    @Column
+    private String status; // ESTADO
+
+    @Column
+    private Integer cycle;  // CICLO
+
+    @Column
+    private Integer quantityMade; // CANTIDAD confeccionada
+
+    @Column
+    private Integer quantityPending;// CANTIDAD faltante
+
+    @Column
+    private Double deliveryPercentage;    // % DE ENTREGA
+
+    @Column
+    private String actualDeliveryDate;    // FECHA ENTREGA REAL
+
+    @Column
+    private Integer firstD;                   // PRIMER D
+
+    @Column
+    private Integer secondD;                  // SEGUNDO D
+
+    @Column
+    private Integer seconds;                  // SEGUNDAS
+
+    @Column
+    private Integer missing;                  // FALTA
+
+    @Column
+    private Double sam;                   // SAM
+
+    @Column
+    private Integer samTotal;                 // SAM TOTAL
+
 }
