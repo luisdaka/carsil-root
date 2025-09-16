@@ -1,13 +1,19 @@
 package com.carsil.userapi.model;
 
+import com.carsil.userapi.model.enums.ProductionStatus;
+import com.carsil.userapi.model.enums.StoppageReason;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Entity
 @Table(
@@ -29,8 +35,8 @@ public class Product {
     private Long id;
 
     @NotNull
-    @Column(nullable = false)
-    private Double price;
+    @Column(nullable = false, precision = 18, scale = 4)
+    private BigDecimal price;
 
     @NotNull
     @Column(nullable = false)
@@ -40,8 +46,7 @@ public class Product {
     @Column(nullable = false)
     private LocalDate assignedDate;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column()
     private LocalDate plantEntryDate;
 
     @NotNull
@@ -80,51 +85,60 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"products"})
     private Module module;
 
     @PrePersist
-    @PreUpdate
-    private void validateAndSyncQuantity() {
-        if (sizeQuantities == null) sizeQuantities = new HashMap<>();
+    private void validateOnCreate() {
+        // Normalización inline
+        if (sizeQuantities == null) sizeQuantities = new java.util.HashMap<>();
         sizeQuantities.replaceAll((k, v) -> v == null ? 0 : Math.max(0, v));
 
         int sum = sizeQuantities.values().stream().mapToInt(Integer::intValue).sum();
+        boolean hasSizes = sum > 0;
 
         if (quantity == null || quantity == 0) {
+            if (!hasSizes) throw new IllegalArgumentException("quantity or sizeQuantities are required on create");
             quantity = sum;
-        } else if (!quantity.equals(sum)) {
-            throw new IllegalArgumentException(
-                    "The sum of sizes (" + sum + ") does not match the total (quantity=" + quantity + ")"
-            );
+        } else {
+            if (!hasSizes) throw new IllegalArgumentException("sizeQuantities are required when quantity is provided on create");
+            if (!quantity.equals(sum)) {
+                throw new IllegalArgumentException("The sum of sizes (" + sum + ") does not match the total (quantity=" + quantity + ")");
+            }
+        }
+
+        if (quantityMade == null) quantityMade = 0;
+        if (quantityMade < 0 || quantityMade > quantity) {
+            throw new IllegalArgumentException("quantityMade must be between 0 and quantity");
         }
     }
 
-    @Column
-    private String status; // ESTADO
+    @jakarta.persistence.PreUpdate
+    private void validateOnUpdate() {
 
-    @Column
-    private Integer cycle;  // CICLO
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("quantity must be set before updating");
+        }
+        if (quantityMade == null) quantityMade = 0;
+        if (quantityMade < 0 || quantityMade > quantity) {
+            throw new IllegalArgumentException("quantityMade must be between 0 and quantity");
+        }
+    }
 
-    @Column
-    private Integer quantityMade; // CANTIDAD confeccionada
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
+    private ProductionStatus status = ProductionStatus.PROCESO;
 
-    @Column
-    private Integer quantityPending;// CANTIDAD faltante
+    @Enumerated(EnumType.STRING)
+    @Column(name = "descripcion_paro", length = 50)
+    private StoppageReason stoppageReason;
 
-    @Column
-    private Double deliveryPercentage;    // % DE ENTREGA
+    @Column(nullable = false)
+    private Integer quantityMade = 0;
 
     @Column
     private String actualDeliveryDate;    // FECHA ENTREGA REAL
-
-    @Column
-    private Integer firstD;                   // PRIMER D
-
-    @Column
-    private Integer secondD;                  // SEGUNDO D
-
-    @Column
-    private Integer seconds;                  // SEGUNDAS
 
     @Column
     private Integer missing;                  // FALTA
@@ -134,5 +148,72 @@ public class Product {
 
     @Column
     private Integer samTotal;                 // SAM TOTAL
+
+    @Transient
+    public BigDecimal getTotalPrice() {
+        return (price == null || quantity == null)
+                ? BigDecimal.ZERO
+                : price.multiply(BigDecimal.valueOf(quantity));
+    }
+
+
+    @Transient
+    public Integer getCycleCalculated() {
+        if (assignedDate == null) return null;
+        LocalDate end = (plantEntryDate != null) ? plantEntryDate : LocalDate.now();
+        long diff = DAYS.between(assignedDate, end);
+        return (diff < 0) ? 0 : Math.toIntExact(diff);
+    }
+
+    @Transient
+    public Integer getQuantityPending() {
+        if (quantity == null || quantityMade == null) return null;
+        return Math.max(0, quantity - quantityMade);
+    }
+
+    public void addMade(int delta) {
+        if (delta == 0) return;
+
+        int base = (quantityMade == null ? 0 : quantityMade);
+        if (quantity == null)
+            throw new IllegalStateException("quantity must be set before updating quantityMade");
+
+        int newMade = base + delta;
+        if (newMade < 0) throw new IllegalArgumentException("quantityMade cannot be negative");
+        if (newMade > quantity) throw new IllegalArgumentException("quantityMade cannot exceed total quantity");
+
+        this.quantityMade = newMade;
+
+        // Si tu negocio define 'missing' y 'samTotal'
+        if (this.quantity != null) this.missing = Math.max(0, this.quantity - newMade);
+        if (this.sam != null && this.missing != null) {
+            this.samTotal = (int) Math.round(this.sam * this.missing);
+        }
+    }
+
+    @Transient
+    public Double getDeliveryPercentage() {
+        if (quantity == null || quantity == 0 || quantityMade == null) {
+            return 0.0;
+        }
+        return (quantityMade.doubleValue() / quantity.doubleValue()) * 100.0;
+    }
+
+    @Transient
+    public BigDecimal getLoadDays() {
+        Integer samTotalMin = this.samTotal;               // minutos del producto
+        Integer people = (module != null ? module.getNumPersons() : null);
+
+        if (samTotalMin == null || samTotalMin <= 0) return BigDecimal.ZERO;
+        if (people == null || people <= 0) return BigDecimal.ZERO; // evita división por 0
+
+        return BigDecimal.valueOf(samTotalMin)
+                .divide(BigDecimal.valueOf(60), 6, RoundingMode.HALF_UP)
+                .divide(BigDecimal.valueOf(9), 6, RoundingMode.HALF_UP)
+                .divide(BigDecimal.valueOf(people), 6, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(1.35))
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
 
 }

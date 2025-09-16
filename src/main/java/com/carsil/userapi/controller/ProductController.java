@@ -49,6 +49,15 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/by-module/{op}")
+    public ResponseEntity<List<Product>> getProductByOp(@PathVariable String op) {
+        List<Product> products = productService.getProductsByOp(op);
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(products);
+    }
+
     @GetMapping("/by-module/{moduleId}")
     public ResponseEntity<List<Product>> getProductsByModule(@PathVariable Long moduleId) {
         List<Product> products = productService.getProductsByModule(moduleId);
@@ -64,5 +73,15 @@ public class ProductController {
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<Product> products = productService.getProductsByDateRange(startDate, endDate);
         return ResponseEntity.ok(products);
+    }
+
+    @PutMapping("/{id}/made")
+    public Product setMade(@PathVariable Long id, @RequestParam("value") int value) {
+        return productService.setMade(id, value);
+    }
+
+    @PatchMapping("/{id}/progress")
+    public Product incrementProgress(@PathVariable Long id, @RequestParam int delta) {
+        return productService.incrementMade(id, delta);
     }
 }

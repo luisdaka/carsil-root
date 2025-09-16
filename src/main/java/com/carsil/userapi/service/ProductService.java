@@ -1,13 +1,14 @@
 package com.carsil.userapi.service;
 
+import com.carsil.userapi.model.Module;
 import com.carsil.userapi.model.Product;
+import com.carsil.userapi.model.enums.ProductionStatus;
 import com.carsil.userapi.repository.ModuleRepository;
 import com.carsil.userapi.repository.ProductRepository;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.carsil.userapi.model.Module;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private ModuleRepository moduleRepo;
+    private ModuleRepository moduleRepository;
 
     @Transactional(readOnly = true)
     public List<Product> getAll() {
@@ -35,70 +36,52 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(Product incoming) {
-        if (incoming.getOp() != null && productRepository.existsByOp(incoming.getOp())) {
-            throw new IllegalArgumentException("this OP already exists: " + incoming.getOp());
-        }
+    public Product create(Product p) {
+        if (p.getStatus() == null) p.setStatus(ProductionStatus.PROCESO);
+        if (p.getQuantityMade() == null) p.setQuantityMade(0);
+        if (p.getQuantity() == null)
+            throw new IllegalArgumentException("quantity is required");
 
-        Product p = new Product();
-        if (incoming.getModule() != null && incoming.getModule().getId() != null) {
-            Long moduleId = incoming.getModule().getId();
-            Module module = moduleRepo.findById(moduleId)
-                    .orElseThrow(() -> new IllegalArgumentException("Module Not Found " + moduleId));
-            p.setModule(module);
-        } else {
-            p.setModule(null);
-        }
-
-        p.setPrice(incoming.getPrice());
-        p.setQuantity(incoming.getQuantity());
-        p.setAssignedDate(incoming.getAssignedDate());
-        p.setPlantEntryDate(incoming.getPlantEntryDate());
-        p.setReference(incoming.getReference());
-        p.setBrand(incoming.getBrand());
-        p.setOp(incoming.getOp());
-        p.setCampaign(incoming.getCampaign());
-        p.setType(incoming.getType());
-        p.setDescription(incoming.getDescription());
-        p.setSizeQuantities(incoming.getSizeQuantities());
+        recalcDerived(p);
 
         return productRepository.save(p);
     }
 
     @Transactional
-    public Product update(Product product, Long id) {
-        return productRepository.findById(id)
-                .map(existing -> {
-                    // Validación: OP única si cambió
-                    if (!existing.getOp().equals(product.getOp())
-                            && productRepository.existsByOpAndIdNot(product.getOp(), id)) {
-                        throw new DuplicateKeyException("op already exists: " + product.getOp());
-                    }
+    public Product update(Product patch,Long id) {
+        Product existing = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
 
-                    Module newModule = null;
-                    if (product.getModule() != null && product.getModule().getId() != null) {
-                        Long moduleId = product.getModule().getId();
-                        newModule = moduleRepo.findById(moduleId)
-                                .orElseThrow(() -> new IllegalArgumentException("Module Not Found " + moduleId));
-                    }
-                    existing.setModule(newModule);
+        if (patch.getPrice() != null) existing.setPrice(patch.getPrice());
+        if (patch.getQuantity() != null) existing.setQuantity(patch.getQuantity());
+        if (patch.getAssignedDate() != null) existing.setAssignedDate(patch.getAssignedDate());
+        if (patch.getPlantEntryDate() != null) existing.setPlantEntryDate(patch.getPlantEntryDate());
+        if (patch.getReference() != null) existing.setReference(patch.getReference());
+        if (patch.getBrand() != null) existing.setBrand(patch.getBrand());
+        if (patch.getCampaign() != null) existing.setCampaign(patch.getCampaign());
+        if (patch.getType() != null) existing.setType(patch.getType());
+        if (patch.getDescription() != null) existing.setDescription(patch.getDescription());
+        if (patch.getSizeQuantities() != null) existing.setSizeQuantities(patch.getSizeQuantities());
+        if (patch.getSam() != null) existing.setSam(patch.getSam());
+        if (patch.getStatus() != null) existing.setStatus(patch.getStatus());
+        if (patch.getStoppageReason() != null) existing.setStoppageReason(patch.getStoppageReason());
+        if (patch.getModule() != null) existing.setModule(patch.getModule());
 
-                    // Copiar campos (los de TU entidad)
-                    existing.setPrice(product.getPrice());
-                    existing.setQuantity(product.getQuantity());
-                    existing.setAssignedDate(product.getAssignedDate());
-                    existing.setPlantEntryDate(product.getPlantEntryDate());
-                    existing.setReference(product.getReference());
-                    existing.setBrand(product.getBrand());
-                    existing.setOp(product.getOp());
-                    existing.setCampaign(product.getCampaign());
-                    existing.setType(product.getType());
-                    existing.setDescription(product.getDescription());
-                    existing.setSizeQuantities(product.getSizeQuantities());
+        if (patch.getOp() != null && !patch.getOp().equals(existing.getOp())
+                && productRepository.existsByOpAndIdNot(patch.getOp(), id)) {
+            throw new org.springframework.dao.DuplicateKeyException("op already exists: " + patch.getOp());
+        }
+        if (patch.getQuantityMade() != null) {
+            int delta = patch.getQuantityMade() - existing.getQuantityMade();
+            existing.addMade(delta);
+        }
 
-                    return productRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("Product not found with id " + id));
+        recalcDerived(existing);
+        try {
+            return productRepository.save(existing);
+        } catch (OptimisticLockException e) {
+            throw new IllegalStateException("Concurrent update detected for product " + id, e);
+        }
     }
 
 
@@ -118,7 +101,49 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public List<Product> getProductsByOp(String op) {
+        return productRepository.findByOp(op);
+    }
+
+    @Transactional(readOnly = true)
     public List<Product> getProductsByDateRange(LocalDate startDate, LocalDate endDate) {
         return productRepository.findByPlantEntryDateBetween(startDate, endDate);
+    }
+
+    @Transactional
+    public Product setMade(Long id, int newValue) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
+        int delta = newValue - (p.getQuantityMade() == null ? 0 : p.getQuantityMade());
+        p.addMade(delta);
+        recalcDerived(p);
+        return productRepository.save(p);
+    }
+
+    private void recalcDerived(Product p) {
+        // missing = quantity - quantityMade
+        if (p.getQuantity() != null) {
+            int made = (p.getQuantityMade() == null ? 0 : p.getQuantityMade());
+            p.setMissing(Math.max(0, p.getQuantity() - made));
+        }
+        // samTotal = missing * sam
+        if (p.getSam() != null && p.getMissing() != null) {
+            p.setSamTotal((int) Math.round(p.getMissing() * p.getSam()));
+        }
+        // status default si faltó
+        if (p.getStatus() == null) p.setStatus(ProductionStatus.PROCESO);
+    }
+
+    @Transactional
+    public Product incrementMade(Long id, int delta) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
+
+        if (delta != 0) {
+            p.addMade(delta);
+        }
+
+        recalcDerived(p);
+        return productRepository.save(p);
     }
 }

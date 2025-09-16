@@ -32,12 +32,22 @@ public class Module {
     @Column(nullable = false)
     private String name;
 
-
-    @NotNull(message = "Remaining time cannot be null.")
-    @Min(value = 0, message = "loadDays cannot be a negative value.")
-    @Column(nullable = false)
-    private float loadDays = 0f;
-
     @Column
     private Integer numPersons;
+
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"module"})
+    private java.util.List<Product> products = new java.util.ArrayList<>();
+
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonProperty("totalLoadDays")
+    public java.math.BigDecimal getTotalLoadDays() {
+        if (products == null || products.isEmpty()) return java.math.BigDecimal.ZERO;
+
+        return products.stream()
+                .map(Product::getLoadDays)
+                .filter(java.util.Objects::nonNull)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add)
+                .setScale(2, java.math.RoundingMode.HALF_UP);
+    }
 }

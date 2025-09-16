@@ -1,6 +1,7 @@
 package com.carsil.userapi.controller;
 
 import com.carsil.userapi.model.Module;
+import com.carsil.userapi.model.Product;
 import com.carsil.userapi.service.ModuleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +45,17 @@ public class ModuleController {
         return moduleService.update(id, input)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // --- Nuevo: listar productos del módulo ---
+    @GetMapping("/{id}/products")
+    public List<Product> products(@PathVariable Long id) {
+        return moduleService.getProducts(id);
+    }
+
+    // --- Nuevo: asignar un producto a un módulo ---
+    @PostMapping("/{moduleId}/assign/{productId}")
+    public Module assignProduct(@PathVariable Long moduleId, @PathVariable Long productId) {
+        return moduleService.assignProduct(moduleId, productId);
     }
 }
