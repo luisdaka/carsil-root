@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -70,7 +71,7 @@ class ProductControllerTest {
         Product productToSave = new Product();
         productToSave.setReference("NEW_REF");
         productToSave.setQuantity(1);
-        productToSave.setPrice(100.0);
+        productToSave.setPrice(BigDecimal.valueOf(100.0));
         productToSave.setAssignedDate(LocalDate.now());
         productToSave.setPlantEntryDate(LocalDate.now());
         productToSave.setBrand("BrandX");
@@ -98,7 +99,7 @@ class ProductControllerTest {
         Product productToUpdate = new Product();
         productToUpdate.setReference("UPDATED_REF");
         productToUpdate.setQuantity(5);
-        productToUpdate.setPrice(250.0);
+        productToUpdate.setPrice(BigDecimal.valueOf(250.0));
         productToUpdate.setAssignedDate(LocalDate.now());
         productToUpdate.setPlantEntryDate(LocalDate.now());
         productToUpdate.setBrand("BrandY");
@@ -140,7 +141,7 @@ class ProductControllerTest {
         p1.setCampaign("CAMP1");
         p1.setAssignedDate(LocalDate.now());
         p1.setPlantEntryDate(LocalDate.now());
-        p1.setPrice(100.0);
+        p1.setPrice(BigDecimal.valueOf(100.0));
         p1.setQuantity(5);
         p1.setType("TypeA");
 
@@ -152,7 +153,7 @@ class ProductControllerTest {
         p2.setCampaign("CAMP2");
         p2.setAssignedDate(LocalDate.now());
         p2.setPlantEntryDate(LocalDate.now());
-        p2.setPrice(200.0);
+        p2.setPrice(BigDecimal.valueOf(200.0));
         p2.setQuantity(10);
         p2.setType("TypeB");
 
