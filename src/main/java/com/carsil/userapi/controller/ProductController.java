@@ -4,11 +4,13 @@ import com.carsil.userapi.model.Product;
 import com.carsil.userapi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -83,5 +85,14 @@ public class ProductController {
     @PatchMapping("/{id}/progress")
     public Product incrementProgress(@PathVariable Long id, @RequestParam int delta) {
         return productService.incrementMade(id, delta);
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Product> patchProduct(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates
+    ) {
+        Product updated = productService.partialUpdate(id, updates);
+        return ResponseEntity.ok(updated);
     }
 }

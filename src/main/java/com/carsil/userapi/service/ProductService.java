@@ -5,14 +5,15 @@ import com.carsil.userapi.model.Product;
 import com.carsil.userapi.model.enums.ProductionStatus;
 import com.carsil.userapi.repository.ModuleRepository;
 import com.carsil.userapi.repository.ProductRepository;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -23,10 +24,19 @@ public class ProductService {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Transactional(readOnly = true)
     public List<Product> getAll() {
         return productRepository.findAll();
     }
+
+    private static final Set<String> IMMUTABLE_FIELDS = Set.of(
+            "id"
+    );
+
+    private static final String MODULE_ID_KEY = "moduleId";
 
     @Transactional
     public void delete(Long id) {
@@ -41,9 +51,12 @@ public class ProductService {
         if (p.getQuantityMade() == null) p.setQuantityMade(0);
         if (p.getQuantity() == null)
             throw new IllegalArgumentException("quantity is required");
-
-        recalcDerived(p);
-
+        if(p.getModule() != null){
+            var m = moduleRepository.findById(p.getModule().getId()).get();
+            m.setLoadDays(p.getLoadDays());
+            moduleRepository.save(m);
+        }
+         recalcDerived(p);
         return productRepository.save(p);
     }
 
@@ -65,8 +78,8 @@ public class ProductService {
         if (patch.getSam() != null) existing.setSam(patch.getSam());
         if (patch.getStatus() != null) existing.setStatus(patch.getStatus());
         if (patch.getStoppageReason() != null) existing.setStoppageReason(patch.getStoppageReason());
+        if (patch.getActualDeliveryDate() != null) existing.setActualDeliveryDate(patch.getActualDeliveryDate());
         if (patch.getModule() != null) existing.setModule(patch.getModule());
-
         if (patch.getOp() != null && !patch.getOp().equals(existing.getOp())
                 && productRepository.existsByOpAndIdNot(patch.getOp(), id)) {
             throw new org.springframework.dao.DuplicateKeyException("op already exists: " + patch.getOp());
@@ -132,6 +145,11 @@ public class ProductService {
         }
         // status default si faltó
         if (p.getStatus() == null) p.setStatus(ProductionStatus.PROCESO);
+        if(p.getModule() != null){
+            Module m = moduleRepository.findById(p.getModule().getId()).get();
+            m.setLoadDays(p.getLoadDays());
+            moduleRepository.save(m);
+        }
     }
 
     @Transactional
@@ -145,5 +163,45 @@ public class ProductService {
 
         recalcDerived(p);
         return productRepository.save(p);
+    }
+
+    @Transactional
+    public Product partialUpdate(Long id, Map<String, Object> updates) {
+        Product existing = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
+
+        if (updates == null || updates.isEmpty()) {
+            return existing;
+        }
+
+        Map<String, Object> sanitized = new HashMap<>(updates);
+        IMMUTABLE_FIELDS.forEach(sanitized::remove);
+
+        if (sanitized.containsKey(MODULE_ID_KEY)) {
+            Object raw = sanitized.remove(MODULE_ID_KEY);
+            if (raw != null) {
+                Long moduleId = toLong(raw);
+                Module module = moduleRepository.findById(moduleId)
+                        .orElseThrow(() -> new IllegalArgumentException("Module not found: " + moduleId));
+                existing.setModule(module);
+            } else {
+                existing.setModule(null);
+            }
+        }
+        try {
+            objectMapper.updateValue(existing, sanitized);
+        } catch (IllegalArgumentException | JsonMappingException e) {
+            throw new RuntimeException("Invalid PATCH payload: " + e.getMessage(), e);
+        }
+
+        recalcDerived(existing);
+
+        return productRepository.save(existing);
+    }
+
+    private Long toLong(Object raw) {
+        if (raw == null) return null;
+        if (raw instanceof Number n) return n.longValue();
+        return Long.valueOf(String.valueOf(raw));
     }
 }

@@ -184,7 +184,6 @@ public class Product {
 
         this.quantityMade = newMade;
 
-        // Si tu negocio define 'missing' y 'samTotal'
         if (this.quantity != null) this.missing = Math.max(0, this.quantity - newMade);
         if (this.sam != null && this.missing != null) {
             this.samTotal = (int) Math.round(this.sam * this.missing);
@@ -201,11 +200,11 @@ public class Product {
 
     @Transient
     public BigDecimal getLoadDays() {
-        Integer samTotalMin = this.samTotal;               // minutos del producto
+        Integer samTotalMin = this.samTotal;
         Integer people = (module != null ? module.getNumPersons() : null);
 
         if (samTotalMin == null || samTotalMin <= 0) return BigDecimal.ZERO;
-        if (people == null || people <= 0) return BigDecimal.ZERO; // evita división por 0
+        if (people == null || people <= 0) return BigDecimal.ZERO;
 
         return BigDecimal.valueOf(samTotalMin)
                 .divide(BigDecimal.valueOf(60), 6, RoundingMode.HALF_UP)

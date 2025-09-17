@@ -3,6 +3,7 @@ package com.carsil.userapi.controller;
 import com.carsil.userapi.model.Module;
 import com.carsil.userapi.model.Product;
 import com.carsil.userapi.service.ModuleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +13,8 @@ import java.util.List;
 @RequestMapping("/api/modules")
 public class ModuleController {
 
-    private final ModuleService moduleService;
-
-    public ModuleController(ModuleService moduleService) {
-        this.moduleService = moduleService;
-    }
+    @Autowired
+    private ModuleService moduleService;
 
     @GetMapping
     public List<Module> getAll() {
@@ -47,13 +45,11 @@ public class ModuleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- Nuevo: listar productos del módulo ---
     @GetMapping("/{id}/products")
     public List<Product> products(@PathVariable Long id) {
         return moduleService.getProducts(id);
     }
 
-    // --- Nuevo: asignar un producto a un módulo ---
     @PostMapping("/{moduleId}/assign/{productId}")
     public Module assignProduct(@PathVariable Long moduleId, @PathVariable Long productId) {
         return moduleService.assignProduct(moduleId, productId);

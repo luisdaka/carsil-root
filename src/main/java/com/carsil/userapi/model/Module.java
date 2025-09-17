@@ -2,7 +2,6 @@ package com.carsil.userapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -35,13 +34,15 @@ public class Module {
     @Column
     private Integer numPersons;
 
+    private java.math.BigDecimal loadDays;
+
     @OneToMany(mappedBy = "module", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"module"})
     private java.util.List<Product> products = new java.util.ArrayList<>();
 
     @Transient
-    @com.fasterxml.jackson.annotation.JsonProperty("totalLoadDays")
-    public java.math.BigDecimal getTotalLoadDays() {
+    @com.fasterxml.jackson.annotation.JsonProperty("totaLoadDays")
+    public java.math.BigDecimal getTotaLoadDays() {
         if (products == null || products.isEmpty()) return java.math.BigDecimal.ZERO;
 
         return products.stream()
