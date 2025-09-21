@@ -1,47 +1,69 @@
 package com.carsil.userapi.exception;
 
+import com.carsil.userapi.exception.ApiError;
+import com.carsil.userapi.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import com.carsil.userapi.exception.ApiError;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Errores de validación con @Valid
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        ApiError error = new ApiError(
+                HttpStatus.NOT_FOUND,
+                "Recurso no encontrado",
+                ex.getMessage() + " → Esto significa que el recurso solicitado no existe o fue eliminado.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation(DataIntegrityViolationException ex, HttpServletRequest request) {
+        ApiError error = new ApiError(
+                HttpStatus.CONFLICT,
+                "Conflicto de datos",
+                "El registro que intentas guardar viola una restricción de la base de datos. " +
+                        "Posiblemente estás intentando registrar un valor duplicado en un campo único. " +
+                        "Detalles técnicos: " + ex.getMostSpecificCause().getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidationExceptions(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        StringBuilder details = new StringBuilder("Errores de validación: ");
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                details.append("Campo '").append(error.getField())
+                        .append("' → ").append(error.getDefaultMessage()).append(". ")
+        );
 
-        String mensaje = ex.getBindingResult().getFieldErrors().stream()
-                .map(err -> err.getField() + ": " + err.getDefaultMessage())
-                .findFirst()
-                .orElse("Error de validación");
-
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mensaje, request.getRequestURI());
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Datos inválidos en la solicitud",
+                details.toString(),
+                request.getRequestURI()
+        );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
-    // Errores de validaciones manuales (ej: en services)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolation(
-            ConstraintViolationException ex, HttpServletRequest request) {
-
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
-    }
-
-    // Cualquier otro error no controlado
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleAllExceptions(
-            Exception ex, HttpServletRequest request) {
-
-        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Ocurrió un error inesperado. Intenta nuevamente.", request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    public ResponseEntity<ApiError> handleGenericException(Exception ex, HttpServletRequest request) {
+        ApiError error = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Error interno del servidor",
+                "Ocurrió un error inesperado mientras se procesaba la solicitud. " +
+                        "Por favor inténtalo más tarde o contacta al administrador. " +
+                        "Detalles: " + ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

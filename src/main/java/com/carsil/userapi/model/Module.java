@@ -3,6 +3,7 @@ package com.carsil.userapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -23,21 +24,20 @@ public class Module {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Size(max = 255, message = "The description cannot exceed 255 characters.")
+    @Size(max = 255, message = "La descripción no puede superar los 255 caracteres.")
     private String description;
 
-    @NotNull(message = "Module name cannot be null.")
-    @Size(min = 2, max = 100, message = "The name must have between 2 and 100 characters.")
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre del módulo no puede estar vacío.")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres.")
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-
-    @NotNull(message = "Remaining time cannot be null.")
-    @Min(value = 0, message = "Remaining time cannot be a negative value.")
+    @NotNull(message = "El tiempo restante no puede ser nulo.")
+    @Min(value = 0, message = "El tiempo restante no puede ser negativo.")
     @Column(nullable = false)
-    private float remainingTime = 0f;
+    private Float remainingTime = 0f;
 
     public Integer getNumPersons() {
-        return 0;
+        return 0; // Placeholder por ahora
     }
 }
