@@ -2,8 +2,11 @@ package com.carsil.userapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+feature/error-handling
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+
+main
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -32,10 +35,26 @@ public class Module {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+ feature/error-handling
     @NotNull(message = "El tiempo restante no puede ser nulo.")
     @Min(value = 0, message = "El tiempo restante no puede ser negativo.")
     @Column(nullable = false)
     private Float remainingTime = 0f;
+
+    @Column
+    private Integer numPersons;
+
+    private java.math.BigDecimal loadDays;
+
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"module"})
+    private java.util.List<Product> products = new java.util.ArrayList<>();
+
+    @Transient
+    @com.fasterxml.jackson.annotation.JsonProperty("totaLoadDays")
+    public java.math.BigDecimal getTotaLoadDays() {
+        if (products == null || products.isEmpty()) return java.math.BigDecimal.ZERO;
+ main
 
     public Integer getNumPersons() {
         return 0; // Placeholder por ahora

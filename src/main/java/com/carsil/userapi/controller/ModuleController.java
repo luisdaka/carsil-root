@@ -3,9 +3,12 @@ package com.carsil.userapi.controller;
 import com.carsil.userapi.exception.ApiError;
 import com.carsil.userapi.model.Module;
 import com.carsil.userapi.service.ModuleService;
+feature/error-handling
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+ main
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +18,8 @@ import java.util.List;
 @RequestMapping("/api/modules")
 public class ModuleController {
 
-    private final ModuleService moduleService;
-
-    public ModuleController(ModuleService moduleService) {
-        this.moduleService = moduleService;
-    }
+    @Autowired
+    private ModuleService moduleService;
 
     // Obtener todos los módulos
     @GetMapping
@@ -100,6 +100,8 @@ public class ModuleController {
 
     // Actualizar módulo
     @PutMapping("/{id}")
+
+  feature/error-handling
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Module input, HttpServletRequest request) {
         try {
             return moduleService.update(id, input)
@@ -133,5 +135,21 @@ public class ModuleController {
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
+
+    public ResponseEntity<Module> update(@PathVariable Long id, @RequestBody Module input) {
+        return moduleService.update(id, input)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/products")
+    public List<Product> products(@PathVariable Long id) {
+        return moduleService.getProducts(id);
+    }
+
+    @PostMapping("/{moduleId}/assign/{productId}")
+    public Module assignProduct(@PathVariable Long moduleId, @PathVariable Long productId) {
+        return moduleService.assignProduct(moduleId, productId);
+ main
     }
 }

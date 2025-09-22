@@ -6,12 +6,16 @@ import com.carsil.userapi.exception.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
+ feature/error-handling
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+ main
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -238,4 +242,17 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
+ feature/error-handling
 }
+
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Product> patchProduct(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates
+    ) {
+        Product updated = productService.partialUpdate(id, updates);
+        return ResponseEntity.ok(updated);
+    }
+}
+main
