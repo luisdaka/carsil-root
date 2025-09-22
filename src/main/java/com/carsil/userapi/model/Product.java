@@ -213,6 +213,4 @@ public class Product {
                 .multiply(BigDecimal.valueOf(1.35))
                 .setScale(2, RoundingMode.HALF_UP);
     }
-
-
 }
